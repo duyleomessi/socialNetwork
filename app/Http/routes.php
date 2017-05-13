@@ -99,4 +99,18 @@ Route::post('/reply/{parent_id}', [
     'middleware' => 'auth'
 ]);
 
+Route::get('/user/{id}', [
+    'uses' => 'UserController@getUserProfile',
+    'as' => 'user-profile',
+    'middleware' => 'auth'
+]);
 
+Route::post('/add_follow', [
+    'uses' => 'FollowController@addFollow',
+    'as' => 'addfollow'
+]);
+
+Route::delete('/delete_follow', [
+    'uses' => 'FollowController@deleteFollow',
+    'as' => 'deletefollow'
+]);

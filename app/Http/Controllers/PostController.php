@@ -17,8 +17,7 @@ class PostController extends Controller
         $posts = Post::orderBy('created_at', 'desc')->get();
        //$comments = DB::table('comments')->orderByIf('parent_id' = 0, 'id', 'parent_id')->get();
         $comments = DB::select('select * from comments order by if(parent_id = 0, id, parent_id)');
-        //$users = DB::table('users')->count();
-        //echo 'comments is ', $comments;
+       
         return view('dashboard', ['posts' => $posts, 'comments' => $comments]);
     }
 

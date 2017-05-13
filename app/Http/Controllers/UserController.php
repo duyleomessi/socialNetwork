@@ -58,6 +58,13 @@ class UserController extends Controller
         return view('account', ['user' => Auth::user()]);
     }
 
+    public function getUserProfile($user_id)
+    {   
+        $user = User::find($user_id);
+        return view('account', ['user' => $user]);
+
+    }
+
     public function postSaveAccount(Request $request)
     {
         $this->validate($request, [

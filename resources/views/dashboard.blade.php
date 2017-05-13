@@ -22,7 +22,7 @@
                 <article class="post" data-postid="{{ $post->id }}">
                     <p>{{ $post->body }}</p>
                     <div class="info">
-                        Posted by {{ $post->user->first_name }} on {{ $post->created_at }}
+                        Posted by <a href="{{ route('user-profile', ['id' => $post->user->id]) }}" >  {{ $post->user->first_name }} on </a> {{ $post->created_at }}
                     </div>
                     <div class="interaction">
                         <a href="#"
@@ -41,20 +41,20 @@
                         @foreach($comments as $comment)
                             <li class="comment-section">
                             @if($comment->post_id == $post->id)
+                                {{-- check if comment is parent comment or reply comment --}}
                                 @if ($comment->parent_id == 0)
                                     <div>
                                         <div> {{$comment->body}} <div>
-                                        <div> Post by {{ $post->user->first_name }} on {{ $comment->created_at }} <div>
+                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id)->first_name }} </a> on {{ $comment->created_at }} <div>
                                         
-                                        <div class="interaction">
-                                            <a href="#" class="reply">Reply</a>
-                                        </div>
                                         <br> 
                                     </div>
                                 @else 
+                                    {{-- if it is reply comment --}}
                                     <div style="margin-left: 40px;">                                    
                                         <div> {{$comment->body}} <div>
-                                        <div> Post by {{ $post->user->first_name }} on {{ $comment->created_at }} <div>
+                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id)->first_name }} </a> on {{ $comment->created_at }} <div>
+                                        
                                         <br>
                                     </div>
                                     <form action="{{ route('reply', ['parent_id' => $comment->parent_id]) }}" method="post" class="reply-form">
