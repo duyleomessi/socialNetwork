@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Like;
 use App\Post;
 use App\Comment;
+use App\Follow;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -14,9 +15,29 @@ class PostController extends Controller
 {
     public function getDashboard()
     {
-        $posts = Post::orderBy('created_at', 'desc')->get();
-       //$comments = DB::table('comments')->orderByIf('parent_id' = 0, 'id', 'parent_id')->get();
+        //$posts = Post::orderBy('created_at', 'desc')->get();
+        $user_id = Auth::user()->id;
+        $followerPosts = DB::table('posts')
+                ->join('follows', function($join) {
+                    $join->on('posts.user_id',  '=', 'follows.following_id')
+                    ->where('follows.follower_id', '=', Auth::user()->id);
+                })
+                ->select('posts.*')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        
+        //dd($followerPosts);
+
+        $ownPost = DB::table('posts')
+                    ->where('posts.user_id', '=', Auth::user()->id)
+                    ->get();
+
+
+        $posts = array_merge($followerPosts, $ownPost);
+        
+
         $comments = DB::select('select * from comments order by if(parent_id = 0, id, parent_id)');
+
        
         return view('dashboard', ['posts' => $posts, 'comments' => $comments]);
     }

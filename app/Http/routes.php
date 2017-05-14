@@ -114,3 +114,8 @@ Route::delete('/delete_follow', [
     'uses' => 'FollowController@deleteFollow',
     'as' => 'deletefollow'
 ]);
+
+Route::get('/user_list', [
+    'uses' => 'UserController@getAllUser',
+    'as' => 'listUser'
+]);

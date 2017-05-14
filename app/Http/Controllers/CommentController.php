@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Session;
 use App\Post;
 use App\User;
 use App\Comment;
+use App\Follow;
+
 
 class CommentController extends Controller
 {

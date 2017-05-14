@@ -18,11 +18,12 @@
     <section class="row posts">
         <div class="col-md-6 col-md-offset-3">
             <header><h3>What other people say...</h3></header>
+
             @foreach($posts as $post)
                 <article class="post" data-postid="{{ $post->id }}">
                     <p>{{ $post->body }}</p>
                     <div class="info">
-                        Posted by <a href="{{ route('user-profile', ['id' => $post->user->id]) }}" >  {{ $post->user->first_name }} on </a> {{ $post->created_at }}
+                        Posted by <a href="{{ route('user-profile', ['id' => $post->user_id]) }}" >  {{ App\User::find($post->user_id)->first_name }}  </a> on {{ $post->created_at }}
                     </div>
                     <div class="interaction">
                         <a href="#"
@@ -31,7 +32,8 @@
                            class="like">{{ Auth::user()->likes()->where('post_id', $post->id)->first() ? Auth::user()->likes()->where('post_id', $post->id)->first()->like == 0 ? 'You don\'t like this post' : 'Dislike' : 'Dislike'  }}</a> |
                         <a href="#"
                            class="comment" role="button">{{ 'Comment' }}</a>
-                        @if(Auth::user() == $post->user)
+            
+                        @if(Auth::user()->id == $post->user_id)
                             |
                             <a href="#" class="edit">Edit</a> |
                             <a href="{{ route('post.delete', ['post_id' => $post->id]) }}">Delete</a>

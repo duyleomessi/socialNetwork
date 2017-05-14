@@ -1,7 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Post;
 use App\User;
+use App\Comment;
+use App\Follow;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +69,12 @@ class UserController extends Controller
 
     }
 
+    public function getAllUser() 
+    {
+        $users = User::all();  
+        return view('user', ['users' => $users]);
+    }
+
     public function postSaveAccount(Request $request)
     {
         $this->validate($request, [
@@ -98,4 +108,6 @@ class UserController extends Controller
         $file = Storage::disk('local')->get($filename);
         return new Response($file, 200);
     }
+
+   
 }
