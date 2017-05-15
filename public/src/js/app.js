@@ -51,20 +51,15 @@ $('.like').on('click', function (event) {
 });
 
 $("#follow_button").click(function (e) {
-
     e.preventDefault();
-
-    var formData = {
-        
-    }
 
     var state = $('#follow_button').val();
 
     var type = "POST"; // if not follow
     var my_url = '';
-    
+
     if (state == "Follow") {
-        type="POST";
+        type = "POST";
         my_url = urlFollow;
     }
 
@@ -73,14 +68,10 @@ $("#follow_button").click(function (e) {
         my_url = urlDelete;
     }
 
-    console.log("state ", state);
-
-    console.log(formData);
-
     $.ajax({
             method: type,
             url: my_url,
-            dataType:"json",
+            dataType: "json",
             data: {
                 following_id: $('#following_id').val(),
                 follower_id: $('#follower_id').val(),
@@ -94,7 +85,10 @@ $("#follow_button").click(function (e) {
                 $('#follow_button').val('Follow');
             }
         })
-        .error(function(err) {
+        .error(function (err) {
             console.log(err);
         });
 });
+
+
+

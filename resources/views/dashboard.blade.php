@@ -41,21 +41,21 @@
 
                         <ul >
                         @foreach($comments as $comment)
-                            <li class="comment-section">
+                            <li class="comment-section-{{$post->id}}">
                             @if($comment->post_id == $post->id)
+
                                 {{-- check if comment is parent comment or reply comment --}}
                                 @if ($comment->parent_id == 0)
-                                    <div>
+                                    <div class="parent-comment">
                                         <div> {{$comment->body}} <div>
-                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id)->first_name }} </a> on {{ $comment->created_at }} <div>
-                                        
+                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id) ->first_name }} </a> on {{ $comment->updated_at }} <div>
                                         <br> 
                                     </div>
                                 @else 
                                     {{-- if it is reply comment --}}
                                     <div style="margin-left: 40px;">                                    
                                         <div> {{$comment->body}} <div>
-                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id)->first_name }} </a> on {{ $comment->created_at }} <div>
+                                        <div> Reply by <a href="{{ route('user-profile', ['id' => $comment->user_id]) }}" > {{ App\User::find($comment->user_id)->first_name }} </a> on {{ $comment->updated_at }} <div>
                                         
                                         <br>
                                     </div>
@@ -64,7 +64,7 @@
                                             <input class="form-control" type="text" name="body" id="commentBody">
                                         </div>
                                         <input type="hidden" name="_token" value="{{ Session::token() }}">
-                                        <input type="hidden" name="post_id" value={{ $post->id }}>
+                                        <input type="hidden" name="post_id" id="post_id" value={{ $post->id }}>
                                         <button type="submit" class="btn btn-primary hide">Submit</button>
                                     </form>
                                 @endif
@@ -73,12 +73,13 @@
                         @endforeach
                         </ul>
 
-                        <form action="{{ route('newComment', ['post_id' => $post->id]) }}" method="post" class="show" id="comment-form">
+                        {{-- Comment section --}}
+                        <form class="comment-form">
                             <div class="form-group">
-                                <input class="form-control" type="text" name="body" id="commentBody">
+                                <input class="form-control" type="text" name="body" class="commentBody" value=''>
+                                <input type="hidden" class="post_id" id="post_id" value="{{ $post->id }}">
+                                <button type="submit" value="submit" class="btn btn-primary" id="commentSubmitButton"></button>
                             </div>
-                            <input type="hidden" name="_token" value="{{ Session::token() }}">
-                            <button type="submit" class="btn btn-primary hide">Submit</button>
                         </form>
                     </div>
                 </article>
@@ -110,9 +111,91 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="//js.pusher.com/3.0/pusher.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
     <script>
         var token = '{{ Session::token() }}';
         var urlEdit = '{{ route('edit') }}';
         var urlLike = '{{ route('like') }}';
+
+        
+        // Ensure CSRF token is sent with AJAX requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        // Added Pusher logging
+        Pusher.log = function(msg) {
+            console.log(msg);
+        };
+
+       // $('#commentSubmitButton').click(function(e) {
+//             console.log('trigger function');
+//             e.preventDefault();
+//             var commentBody = $('#commentBody').val();
+//             var post_id = $('#post_id').val();
+//             $.ajax({
+//                 method: 'post',
+//                 url: '/comments/post',
+//                 data: {
+//                     body: commentBody,
+//                     post_id: post_id,
+//                     _token: token
+//                 }
+//                 })
+//                 .done(function(data) {
+//                     console.log("data: ", data);
+//                 })
+//                 .error(function(err) {
+//                     console.log('error: ', err);
+//                 })
+//             })
+
+    
+
+    $('.comment-form').each(function(index) {
+        
+        $(this).on('submit' ,function(e) {
+            e.preventDefault();
+            var commentBody = $(this).children(".commentBody")['context'][0].value;
+            var post_id = $(this).children(".post_id")['context'][1].value;
+
+            $.ajax({
+                method: 'post',
+                url: '/comments/post',
+                data: {
+                    body: commentBody,
+                    post_id: post_id,
+                    _token: token
+                }
+            })
+            .done(function(data) {
+                console.log("data: ", data);
+                var comment = data.message;
+                
+                //var classname = ".parent-comment-" + comment.post_id;
+                var classname = ".comment-section-" + comment.post_id + ":last-child";
+                $(classname)
+                .append('<div class="parent-comment">' 
+                + '<div>' + comment.body + '</div>' 
+                + '<div>' + ' Reply by ' + comment.username  
+                + ' on ' + comment.updated_at + '</div>'    
+                + '</div>' );
+
+            })
+            .error(function(err) {
+                console.log('error: ', err);
+             })
+        })
+    })
+            
+
+        
+       
     </script>
 @endsection
