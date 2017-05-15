@@ -1,3 +1,16 @@
+.navbar-default {
+    background: #45619D !important;
+    color: #fff !important;
+}
+
+.navbar-default .navbar-brand {
+    color: #fff !important;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #fff !important;
+}
+
 .new-post {
     padding: 16px 0;
     border-bottom: 1px solid #ccc;
@@ -56,4 +69,101 @@ ul {
 
 .show {
     display: block;
+}
+
+
+
+#noti_Button, #notifications, h3 {
+    background: #FFF
+}
+
+/*h3, ul {
+    display: block;
+    margin: 0
+}
+
+ul {
+     
+    list-style: none;
+    padding: 12px 10px;
+    height: 21px
+}
+
+ul li {
+    float: left;
+    font: 13px helvetica;
+    font-weight: 700;
+    margin: 3px 0
+}
+
+
+
+ul li a:hover {
+    background: #425B90
+}*/
+
+#noti_Container {
+    position: relative
+}
+
+#noti_Button {
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    margin: 13px 15px 0;
+    cursor: pointer
+}
+
+#noti_Counter {
+    display: block;
+    position: absolute;
+    background: #E1141E;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 1px 3px;
+    margin: -8px 0 0 25px;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    z-index: 1
+}
+
+.seeAll, h3 {
+    padding: 8px
+}
+
+#notifications {
+    display: none;
+    color: #333!important;
+    width: 430px;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    border: 1px solid rgba(100, 100, 100, .2);
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .2);
+    z-index: 4
+}
+
+#notifications:before {
+    display: block;
+    width: 0;
+    height: 0;
+    color: transparent;
+    border: 10px solid #CCC;
+    border-color: transparent transparent #FFF;
+    margin-top: -20px;
+    margin-left: 10px
+}
+
+h3 {
+    color: #333;
+    font: 13px helvetica;
+    font-weight: 700;
+    font-size: 13px;
+    font-style: normal;
+    border-bottom: solid 1px rgba(100, 100, 100, .3)
 }

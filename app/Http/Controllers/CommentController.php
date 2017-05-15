@@ -15,6 +15,7 @@ use App\Post;
 use App\User;
 use App\Comment;
 use App\Follow;
+use App\Notification;
 
 
 class CommentController extends Controller
@@ -25,20 +26,33 @@ class CommentController extends Controller
         $comment = new Comment();
         $comment->body = Input::get('body');
         $comment->post_id = Input::get('post_id');
+        
         // save comment
         $request->user()->posts()->save($comment);
+
         // user that post comment
         $username = Auth::user()->first_name;
+        // send user information who post comment to client
         $comment->username = $username;
 
+        // the one post article
         $postBy = Post::find($comment->post_id)->user_id;
+
         if($postBy != Auth::user()->id) {
             // create notification
-            $textNotification = $username . " comment on your post";
+            $textNotification = $username . " comment on your post ";
             
             // get pusher instance from service container
             $pusher = App::make('pusher');
 
+            $notification = new Notification();
+            
+            $notification->user_id = $postBy;
+            $notification->body = $textNotification;
+            $notification->post_id = $comment->post_id;
+
+            $notification->save();
+            
             $data = array('text' => $textNotification, 'postBy' => $postBy);
 
             // trigger the event

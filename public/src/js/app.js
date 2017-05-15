@@ -90,5 +90,3 @@ $("#follow_button").click(function (e) {
         });
 });
 
-
-

@@ -131,3 +131,13 @@ Route::get('/user_list', [
     'uses' => 'UserController@getAllUser',
     'as' => 'listUser'
 ]);
+
+Route::get('/view/{post_id}', [
+    'uses' => 'NotificationController@viewNotification',
+    'as' => 'view-post'
+]);
+
+Route::get('/noticount/reset', [
+    'uses' => 'NotificationController@updateNotificationCount',
+    'as' => 'notification.update'
+]);

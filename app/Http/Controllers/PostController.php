@@ -5,6 +5,7 @@ use App\Like;
 use App\Post;
 use App\Comment;
 use App\Follow;
+use App\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
+    
+
     public function getDashboard()
     {
         //$posts = Post::orderBy('created_at', 'desc')->get();
@@ -38,7 +41,8 @@ class PostController extends Controller
 
         $comments = DB::select('select * from comments order by if(parent_id = 0, id, parent_id)');
 
-       
+        //$notifications = $this->getNotification();
+
         return view('dashboard', ['posts' => $posts, 'comments' => $comments]);
     }
 
