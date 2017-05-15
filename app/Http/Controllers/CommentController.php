@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\App;
 
 use Log;
 use App\Post;
@@ -24,13 +25,27 @@ class CommentController extends Controller
         $comment = new Comment();
         $comment->body = Input::get('body');
         $comment->post_id = Input::get('post_id');
-        
+        // save comment
         $request->user()->posts()->save($comment);
+        // user that post comment
+        $username = Auth::user()->first_name;
+        $comment->username = $username;
 
-         $username = Auth::user()->first_name;
+        $postBy = Post::find($comment->post_id)->user_id;
+        if($postBy != Auth::user()->id) {
+            // create notification
+            $textNotification = $username . " comment on your post";
+            
+            // get pusher instance from service container
+            $pusher = App::make('pusher');
 
-         $comment->username = $username;
-         
+            $data = array('text' => $textNotification, 'postBy' => $postBy);
+
+            // trigger the event
+            $pusher->trigger('comment-notification', 'comment-event', $data);
+            
+        }
+        
 
         //return redirect()->route('dashboard');
         return response()->json(["message" => $comment], 200);

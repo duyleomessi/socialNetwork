@@ -11,6 +11,7 @@
                               placeholder="Your Post"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Create Post</button>
+                <input type="hidden" id="ownId" value="{{ Auth::user()->id }}">
                 <input type="hidden" value="{{ Session::token() }}" name="_token">
             </form>
         </div>
@@ -78,7 +79,7 @@
                             <div class="form-group">
                                 <input class="form-control" type="text" name="body" class="commentBody" value=''>
                                 <input type="hidden" class="post_id" id="post_id" value="{{ $post->id }}">
-                                <button type="submit" value="submit" class="btn btn-primary" id="commentSubmitButton"></button>
+                                <button type="submit" value="submit" class="btn btn-primary hide" id="commentSubmitButton"></button>
                             </div>
                         </form>
                     </div>
@@ -110,11 +111,15 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+ 
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script src="//js.pusher.com/3.0/pusher.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="//js.pusher.com/3.0/pusher.min.js"></script>
 
     <script>
         var token = '{{ Session::token() }}';
@@ -134,68 +139,59 @@
             console.log(msg);
         };
 
-       // $('#commentSubmitButton').click(function(e) {
-//             console.log('trigger function');
-//             e.preventDefault();
-//             var commentBody = $('#commentBody').val();
-//             var post_id = $('#post_id').val();
-//             $.ajax({
-//                 method: 'post',
-//                 url: '/comments/post',
-//                 data: {
-//                     body: commentBody,
-//                     post_id: post_id,
-//                     _token: token
-//                 }
-//                 })
-//                 .done(function(data) {
-//                     console.log("data: ", data);
-//                 })
-//                 .error(function(err) {
-//                     console.log('error: ', err);
-//                 })
-//             })
+        //submit comment
+        $('.comment-form').each(function(index) {
+            $(this).on('submit' ,function(e) {
+                e.preventDefault();
+                var commentBody = $(this).children(".commentBody")['context'][0].value;
+                var post_id = $(this).children(".post_id")['context'][1].value;
 
-    
+                $.ajax({
+                    method: 'post',
+                    url: '/comments/post',
+                    data: {
+                        body: commentBody,
+                        post_id: post_id,
+                        _token: token
+                    }
+                })
+                .done(function(data) {
+                    console.log("data: ", data);
+                    var comment = data.message;
+                    
+                    //var classname = ".parent-comment-" + comment.post_id;
+                    var classname = ".comment-section-" + comment.post_id + ":last-child";
+                    $(classname)
+                    .append('<div class="parent-comment">' 
+                    + '<div>' + comment.body + '</div>' 
+                    + '<div>' + ' Reply by ' + comment.username  
+                    + ' on ' + comment.updated_at + '</div>'    
+                    + '</div>' );
 
-    $('.comment-form').each(function(index) {
-        
-        $(this).on('submit' ,function(e) {
-            e.preventDefault();
-            var commentBody = $(this).children(".commentBody")['context'][0].value;
-            var post_id = $(this).children(".post_id")['context'][1].value;
-
-            $.ajax({
-                method: 'post',
-                url: '/comments/post',
-                data: {
-                    body: commentBody,
-                    post_id: post_id,
-                    _token: token
-                }
+                })
+                .error(function(err) {
+                    console.log('error: ', err);
+                })
             })
-            .done(function(data) {
-                console.log("data: ", data);
-                var comment = data.message;
-                
-                //var classname = ".parent-comment-" + comment.post_id;
-                var classname = ".comment-section-" + comment.post_id + ":last-child";
-                $(classname)
-                .append('<div class="parent-comment">' 
-                + '<div>' + comment.body + '</div>' 
-                + '<div>' + ' Reply by ' + comment.username  
-                + ' on ' + comment.updated_at + '</div>'    
-                + '</div>' );
+        });
 
-            })
-            .error(function(err) {
-                console.log('error: ', err);
-             })
-        })
-    })
-            
+        function showNotification(data) {
+            // get text from event data
+            var text = data.text;
+            // use the text in the  notification
+            toastr.success(text, null, {"positionClass": "toast-bottom-left"});
+        }
 
-        
+        var ownId = $('#ownId').val();
+        console.log('ownId', ownId);
+        var pusher = new Pusher('{{env("PUSHER_KEY")}}');
+        var channel = pusher.subscribe('comment-notification');
+        channel.bind('comment-event', function(data) {
+            console.log("data is: ", data);
+            if(ownId == data.postBy) {
+                showNotification(data);
+            }
+        }); 
        
     </script>
 @endsection
